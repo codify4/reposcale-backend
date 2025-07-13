@@ -3,7 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
 export class GithubGuard extends AuthGuard('github') {
-    constructor() {
-        super();
-    }
+  constructor() {
+    super();
+  }
 }

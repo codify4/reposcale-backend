@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { LemonSqueezyService } from './lemonsqueezy.service';
 import { Request, Response } from 'express';
-  
+
 @Controller('lemon-squeezy')
 export class LemonSqueezyController {
   private readonly logger = new Logger(LemonSqueezyController.name);
@@ -20,22 +20,18 @@ export class LemonSqueezyController {
   constructor(private readonly lemonService: LemonSqueezyService) {}
 
   @Post('checkout')
-  async createCheckout(
-    @Body() body: { variantId: string },
-  ) {
+  async createCheckout(@Body() body: { variantId: string }) {
     const { variantId } = body;
 
     if (!variantId) {
       throw new BadRequestException('variantId is required');
     }
 
-    const checkoutUrl = await this.lemonService.createCheckout(
-      variantId,
-    );
+    const checkoutUrl = await this.lemonService.createCheckout(variantId);
 
     return { checkoutUrl };
   }
-  
+
   @Post('webhook')
   @HttpCode(HttpStatus.OK)
   async handleWebhook(
@@ -47,7 +43,9 @@ export class LemonSqueezyController {
       // rawBody must be available for signature verification (see middleware setup)
       const rawBody = (req as any).rawBody;
       if (!rawBody) {
-        this.logger.error('Raw body is missing for webhook signature verification');
+        this.logger.error(
+          'Raw body is missing for webhook signature verification',
+        );
         return res.status(400).send('Raw body required');
       }
 
@@ -67,4 +65,3 @@ export class LemonSqueezyController {
     }
   }
 }
-  

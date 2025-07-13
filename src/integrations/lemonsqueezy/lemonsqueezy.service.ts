@@ -2,7 +2,7 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as crypto from 'crypto';
-import { OrdersService } from 'src/orders/orders.service';
+import { OrdersService } from 'src/integrations/orders/orders.service';
 
 @Injectable()
 export class LemonSqueezyService {
@@ -38,7 +38,10 @@ export class LemonSqueezyService {
 
       return response.data.data.attributes.checkout_url;
     } catch (error) {
-      this.logger.error('Failed to create Lemon Squeezy checkout', error.response?.data || error.message);
+      this.logger.error(
+        'Failed to create Lemon Squeezy checkout',
+        error.response?.data || error.message,
+      );
       throw new BadRequestException('Unable to create checkout session');
     }
   }
@@ -84,6 +87,12 @@ export class LemonSqueezyService {
     amount: number;
     purchasedAt: string;
   }) {
-    await this.ordersService.createOrder(order.userId, order.productId, order.amount, order.variantId, order.lemonOrderId);
+    await this.ordersService.createOrder(
+      order.userId,
+      order.productId,
+      order.amount,
+      order.variantId,
+      order.lemonOrderId,
+    );
   }
 }

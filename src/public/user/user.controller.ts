@@ -4,10 +4,10 @@ import { GetCurrentUserId } from 'src/auth/common/decorators/get-current-user-id
 
 @Controller('user')
 export class UserController {
-    constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
-    @Get('')
-    getMe(@GetCurrentUserId() userId: number) {
-        return this.userService.getMe(userId);
-    }
+  @Get('')
+  getMe(@GetCurrentUserId() userId: number) {
+    return this.userService.getMe(userId);
+  }
 }

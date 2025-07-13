@@ -1,30 +1,29 @@
 import { Module } from '@nestjs/common';
-import { UserModule } from './user/user.module';
+import { UserModule } from './public/user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { GithubModule } from './github/github.module';
-import { LemonsqueezyModule } from './lemonsqueezy/lemonsqueezy.module';
-import { AnalyticsController } from './analytics/analytics.controller';
-import { AnalyticsModule } from './analytics/analytics.module';
-import { BucketsService } from './buckets/buckets.service';
-import { BucketsModule } from './buckets/buckets.module';
-import { LinksController } from './links/links.controller';
-import { LinksModule } from './links/links.module';
+import { GithubModule } from './integrations/github/github.module';
+import { LemonSqueezyModule } from './integrations/lemonsqueezy/lemonsqueezy.module';
+import { AnalyticsController } from './public/analytics/analytics.controller';
+import { AnalyticsModule } from './public/analytics/analytics.module';
+import { BucketsService } from './public/buckets/buckets.service';
+import { BucketsModule } from './public/buckets/buckets.module';
+import { LinksController } from './public/links/links.controller';
+import { LinksModule } from './public/links/links.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/common/guards/jwt.guard';
-import { OrdersModule } from './orders/orders.module';
-import { OrderService } from './order/order.service';
+import { OrdersModule } from './integrations/orders/orders.module';
 
 @Module({
   imports: [
-    UserModule, 
-    AuthModule, 
-    GithubModule, 
-    LemonsqueezyModule, 
-    AnalyticsModule, 
-    BucketsModule, 
-    LinksModule, 
+    UserModule,
+    AuthModule,
+    GithubModule,
+    LemonSqueezyModule,
+    AnalyticsModule,
+    BucketsModule,
+    LinksModule,
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
     OrdersModule,
@@ -36,7 +35,6 @@ import { OrderService } from './order/order.service';
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
-    OrderService,
   ],
 })
 export class AppModule {}

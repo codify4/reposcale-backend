@@ -13,6 +13,8 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/common/guards/jwt.guard';
+import { OrdersModule } from './orders/orders.module';
+import { OrderService } from './order/order.service';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { JwtGuard } from './auth/common/guards/jwt.guard';
     LinksModule, 
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
+    OrdersModule,
   ],
   controllers: [AnalyticsController, LinksController],
   providers: [
@@ -33,6 +36,7 @@ import { JwtGuard } from './auth/common/guards/jwt.guard';
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
+    OrderService,
   ],
 })
 export class AppModule {}

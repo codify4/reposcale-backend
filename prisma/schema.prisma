@@ -23,6 +23,21 @@ model User {
   avatarUrl String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  orders    Order[]
 
   @@map("users")
+}
+
+model Order {
+  id           String   @id @default(cuid())
+  lemonOrderId String   @unique
+  userId       Int
+  productId    String
+  variantId    String
+  amount       Float
+  purchasedAt  DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User     @relation(fields: [userId], references: [id])
 }

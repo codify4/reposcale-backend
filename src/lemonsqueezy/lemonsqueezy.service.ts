@@ -2,12 +2,16 @@ import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as crypto from 'crypto';
+import { OrdersService } from 'src/orders/orders.service';
 
 @Injectable()
 export class LemonSqueezyService {
   private readonly logger = new Logger(LemonSqueezyService.name);
 
-  constructor(private readonly httpService: HttpService) {}
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly ordersService: OrdersService,
+  ) {}
 
   async createCheckout(variantId: string): Promise<string> {
     const url = 'https://api.lemonsqueezy.com/v1/checkouts';
@@ -60,9 +64,10 @@ export class LemonSqueezyService {
       const orderData = payload.data;
 
       await this.saveOrder({
-        orderId: orderData.id,
-        userEmail: orderData.attributes.email,
+        lemonOrderId: orderData.id,
+        userId: orderData.attributes.user_id,
         productId: orderData.attributes.product_id,
+        variantId: orderData.attributes.variant_id,
         amount: orderData.attributes.total,
         purchasedAt: orderData.attributes.created_at,
       });
@@ -72,12 +77,13 @@ export class LemonSqueezyService {
   }
 
   async saveOrder(order: {
-    orderId: string;
-    userEmail: string;
+    userId: number;
     productId: string;
+    variantId: string;
+    lemonOrderId: string;
     amount: number;
     purchasedAt: string;
   }) {
-    this.logger.log(`Order saved: ${order.orderId} for ${order.userEmail}`);
+    await this.ordersService.createOrder(order.userId, order.productId, order.amount, order.variantId, order.lemonOrderId);
   }
 }

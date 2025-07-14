@@ -1,8 +1,7 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { LemonSqueezyService } from './lemonsqueezy.service';
 import { LemonSqueezyController } from './lemonsqueezy.controller';
 import { HttpModule } from '@nestjs/axios';
-import { RawBodyMiddleware } from 'src/middleware/raw-body.middleware';
 import { OrdersModule } from '../orders/orders.module';
 
 @Module({
@@ -13,8 +12,4 @@ import { OrdersModule } from '../orders/orders.module';
   providers: [LemonSqueezyService],
   controllers: [LemonSqueezyController],
 })
-export class LemonSqueezyModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RawBodyMiddleware).forRoutes('lemon-squeezy/webhook');
-  }
-}
+export class LemonSqueezyModule {}

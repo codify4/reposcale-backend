@@ -4,14 +4,15 @@ import {
   Body,
   Headers,
   Req,
-  Res,
-  HttpCode,
   HttpStatus,
   Logger,
   BadRequestException,
+  HttpException,
 } from '@nestjs/common';
 import { LemonSqueezyService } from './lemonsqueezy.service';
-import { Request, Response } from 'express';
+import { Request } from 'express';
+import { Public } from 'src/auth/common/decorators/public.decorator';
+import { GetCurrentUserId } from 'src/auth/common/decorators/get-current-user-id.decorator';
 
 @Controller('lemon-squeezy')
 export class LemonSqueezyController {
@@ -20,48 +21,52 @@ export class LemonSqueezyController {
   constructor(private readonly lemonService: LemonSqueezyService) {}
 
   @Post('checkout')
-  async createCheckout(@Body() body: { variantId: string }) {
+  async createCheckout(
+    @Body() body: { variantId: string },
+    @GetCurrentUserId() userId: number,
+  ) {
     const { variantId } = body;
 
     if (!variantId) {
       throw new BadRequestException('variantId is required');
     }
 
-    const checkoutUrl = await this.lemonService.createCheckout(variantId);
-
+    const checkoutUrl = await this.lemonService.createCheckout(variantId, userId);
+    
     return { checkoutUrl };
   }
 
+  @Public()
   @Post('webhook')
-  @HttpCode(HttpStatus.OK)
   async handleWebhook(
     @Req() req: Request,
-    @Res() res: Response,
     @Headers('x-signature') signature: string,
   ) {
     try {
-      // rawBody must be available for signature verification (see middleware setup)
-      const rawBody = (req as any).rawBody;
+      const rawBody = req.body.toString('utf8');
+
       if (!rawBody) {
         this.logger.error(
           'Raw body is missing for webhook signature verification',
         );
-        return res.status(400).send('Raw body required');
+        throw new HttpException('Raw body required', HttpStatus.BAD_REQUEST);
       }
 
       if (!this.lemonService.verifyWebhookSignature(rawBody, signature)) {
         this.logger.warn('Invalid webhook signature');
-        return res.status(400).send('Invalid signature');
+        throw new HttpException('Invalid signature', HttpStatus.BAD_REQUEST);
       }
 
       const payload = JSON.parse(rawBody);
-
       await this.lemonService.handleWebhookEvent(payload);
-
-      return res.status(200).send('ok');
+      this.logger.log('Webhook event handled successfully');
+      return { success: true };
     } catch (error) {
       this.logger.error('Error handling webhook', error);
-      return res.status(500).send('Internal server error');
+      throw new HttpException(
+        'Internal server error',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

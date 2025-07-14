@@ -13,7 +13,7 @@ export class LemonSqueezyService {
     private readonly ordersService: OrdersService,
   ) {}
 
-  async createCheckout(variantId: string): Promise<string> {
+  async createCheckout(variantId: string, userId: number): Promise<string> {
     const url = 'https://api.lemonsqueezy.com/v1/checkouts';
 
     const payload = {
@@ -23,6 +23,11 @@ export class LemonSqueezyService {
           product_options: {
             redirect_url: `${process.env.SITE_URL}/dashboard`,
           },
+          checkout_data: {
+            custom: {
+              user_id: userId
+            }
+          }
         },
         relationships: {
           store: {
@@ -52,7 +57,6 @@ export class LemonSqueezyService {
         }),
       );
 
-      // The checkout URL is in the 'url' attribute, not 'checkout_url'
       return response.data.data.attributes.url;
     } catch (error) {
       this.logger.error(
@@ -82,12 +86,19 @@ export class LemonSqueezyService {
     if (eventName === 'order_created') {
       this.logger.log('Processing order_created event');
       const orderData = payload.data;
+      
+      const userId = orderData.attributes.checkout_data?.custom?.user_id;
+      
+      if (!userId) {
+        this.logger.error('No user_id found in webhook payload custom data');
+        return;
+      }
 
       await this.ordersService.createOrder(
-        orderData.attributes.user_id,
-        orderData.attributes.product_id,
+        userId,
+        orderData.attributes.first_order_item?.product_id || orderData.attributes.product_id,
         orderData.attributes.total,
-        orderData.attributes.variant_id,
+        orderData.attributes.first_order_item?.variant_id || orderData.attributes.variant_id,
         orderData.id,
       );
     } else {

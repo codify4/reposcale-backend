@@ -20,7 +20,23 @@ export class LemonSqueezyService {
       data: {
         type: 'checkouts',
         attributes: {
-          variant_id: variantId,
+          product_options: {
+            redirect_url: `${process.env.SITE_URL}/dashboard`,
+          },
+        },
+        relationships: {
+          store: {
+            data: {
+              type: 'stores',
+              id: process.env.LEMON_SQUEEZY_STORE_ID,
+            },
+          },
+          variant: {
+            data: {
+              type: 'variants',
+              id: variantId,
+            },
+          },
         },
       },
     };
@@ -36,7 +52,8 @@ export class LemonSqueezyService {
         }),
       );
 
-      return response.data.data.attributes.checkout_url;
+      // The checkout URL is in the 'url' attribute, not 'checkout_url'
+      return response.data.data.attributes.url;
     } catch (error) {
       this.logger.error(
         'Failed to create Lemon Squeezy checkout',
@@ -66,33 +83,15 @@ export class LemonSqueezyService {
       this.logger.log('Processing order_created event');
       const orderData = payload.data;
 
-      await this.saveOrder({
-        lemonOrderId: orderData.id,
-        userId: orderData.attributes.user_id,
-        productId: orderData.attributes.product_id,
-        variantId: orderData.attributes.variant_id,
-        amount: orderData.attributes.total,
-        purchasedAt: orderData.attributes.created_at,
-      });
+      await this.ordersService.createOrder(
+        orderData.attributes.user_id,
+        orderData.attributes.product_id,
+        orderData.attributes.total,
+        orderData.attributes.variant_id,
+        orderData.id,
+      );
     } else {
       this.logger.warn(`Ignoring unhandled webhook event: ${eventName}`);
     }
-  }
-
-  async saveOrder(order: {
-    userId: number;
-    productId: string;
-    variantId: string;
-    lemonOrderId: string;
-    amount: number;
-    purchasedAt: string;
-  }) {
-    await this.ordersService.createOrder(
-      order.userId,
-      order.productId,
-      order.amount,
-      order.variantId,
-      order.lemonOrderId,
-    );
   }
 }

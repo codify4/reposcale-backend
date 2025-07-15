@@ -7,9 +7,9 @@ export class OrdersService {
 
   async createOrder(
     userId: number,
-    productId: string,
+    productId: number,
     amount: number,
-    variantId: string,
+    variantId: number,
     lemonOrderId: string,
   ) {
     

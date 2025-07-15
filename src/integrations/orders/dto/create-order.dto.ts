@@ -6,12 +6,12 @@ export class CreateOrderDto {
   userId: number;
 
   @IsNotEmpty()
-  @IsString()
-  productId: string;
+  @IsNumber()
+  productId: number;
 
   @IsNotEmpty()
-  @IsString()
-  variantId: string;
+  @IsNumber()
+  variantId: number;
 
   @IsNotEmpty()
   @IsNumber()

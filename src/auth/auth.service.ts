@@ -13,14 +13,15 @@ export class AuthService {
 
   async findOrCreateUserFromGithub(profile: Profile) {
     const githubId = profile.id;
-    const email = profile.email;
+    const email = profile.emails[0].value;
     const username = profile.username;
     const name = profile.displayName || null;
     const avatarUrl = profile.photos && profile.photos[0]?.value;
 
+    console.log(githubId, email, username, name, avatarUrl, profile.emails);
     let user = await this.prisma.user.findUnique({
-      where: { githubId },
-    });
+      where: { githubId }, 
+    });  
 
     if (!user) {
       user = await this.prisma.user.create({

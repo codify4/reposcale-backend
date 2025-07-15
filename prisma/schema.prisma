@@ -32,8 +32,8 @@ model Order {
   id           String   @id @default(cuid())
   lemonOrderId String   @unique
   userId       Int
-  productId    String
-  variantId    String
+  productId    Int
+  variantId    Int
   amount       Float
   purchasedAt  DateTime
   createdAt    DateTime @default(now())

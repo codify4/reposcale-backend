@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import * as crypto from 'crypto';
 import { OrdersService } from 'src/integrations/orders/orders.service';
+import { UserService } from 'src/public/user/user.service';
 
 @Injectable()
 export class LemonSqueezyService {
@@ -11,10 +12,16 @@ export class LemonSqueezyService {
   constructor(
     private readonly httpService: HttpService,
     private readonly ordersService: OrdersService,
+    private readonly userService: UserService,
   ) {}
 
   async createCheckout(variantId: string, userId: number): Promise<string> {
     const url = 'https://api.lemonsqueezy.com/v1/checkouts';
+
+    const user = await this.userService.getMe(userId);
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
 
     const payload = {
       data: {
@@ -23,10 +30,8 @@ export class LemonSqueezyService {
           product_options: {
             redirect_url: `${process.env.SITE_URL}/dashboard`,
           },
-          checkout_data: {
-            custom: {
-              user_id: userId
-            }
+          checkout_data: { 
+            email: user.email,
           }
         },
         relationships: {
@@ -81,14 +86,20 @@ export class LemonSqueezyService {
   }
 
   async handleWebhookEvent(payload: any) {
+    this.logger.log('Webhook payload structure:', JSON.stringify(payload, null, 2));
     const eventName = payload.meta?.event_name;
 
     if (eventName === 'order_created') {
       this.logger.log('Processing order_created event');
       const orderData = payload.data;
+
+      const userEmail = orderData.attributes.user_email
+      if (!userEmail) {
+        this.logger.error('No user_email found in webhook payload');
+        return;
+      }
       
-      const userId = orderData.attributes.checkout_data?.custom?.user_id;
-      
+      const userId = await this.userService.getUserIdByEmail(userEmail);
       if (!userId) {
         this.logger.error('No user_id found in webhook payload custom data');
         return;

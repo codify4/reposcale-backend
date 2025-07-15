@@ -14,8 +14,6 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/common/guards/jwt.guard';
 import { OrdersModule } from './integrations/orders/orders.module';
-import { DatabaseService } from './database/database.service';
-import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -29,7 +27,6 @@ import { DatabaseModule } from './database/database.module';
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
     OrdersModule,
-    DatabaseModule,
   ],
   controllers: [AnalyticsController, LinksController],
   providers: [
@@ -38,7 +35,6 @@ import { DatabaseModule } from './database/database.module';
       provide: APP_GUARD,
       useClass: JwtGuard,
     },
-    DatabaseService,
   ],
 })
 export class AppModule {}

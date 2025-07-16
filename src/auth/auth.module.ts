@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { GithubStrategy } from './strategies/github.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       },
     }),
     PassportModule,
+    HttpModule,
   ],
   providers: [AuthService, GithubStrategy, JwtStrategy],
   controllers: [AuthController],

@@ -8,28 +8,6 @@ export class GithubService {
     private readonly logger = new Logger(GithubService.name);
     constructor(private readonly httpService: HttpService) {}
 
-    async getInstallations() {
-        const appJwt = this.generateAppJwt();
-
-        try {
-            const installationsResponse = await firstValueFrom(this.httpService.get(
-                'https://api.github.com/app/installations',
-                {
-                    headers: {
-                        Authorization: `Bearer ${appJwt}`,
-                        Accept: 'application/vnd.github+json',
-                    },
-                }
-            ));
-            
-            this.logger.log(`Found ${installationsResponse.data.length} installations`);
-            return installationsResponse.data;
-        } catch (error) {
-            this.logger.error('Failed to get installations', error);
-            throw new UnauthorizedException('Failed to get installations');
-        }
-    }
-
     async getInstallationAccessToken(installationId: number) {
         const appJwt = this.generateAppJwt();
 
@@ -58,6 +36,33 @@ export class GithubService {
         }
     }
 
+    async getInstallationUrl(state?: string) {
+        let url = `https://github.com/apps/reposcale/installations/select_target`;
+        return url;
+    }
+
+    async getInstallations() {
+        const appJwt = this.generateAppJwt();
+
+        try {
+            const installationsResponse = await firstValueFrom(this.httpService.get(
+                'https://api.github.com/app/installations',
+                {
+                    headers: {
+                        Authorization: `Bearer ${appJwt}`,
+                        Accept: 'application/vnd.github+json',
+                    },
+                }
+            ));
+            
+            this.logger.log(`Found ${installationsResponse.data.length} installations`);
+            return installationsResponse.data;
+        } catch (error) {
+            this.logger.error('Failed to get installations', error);
+            throw new UnauthorizedException('Failed to get installations');
+        }
+    }
+
     async getInstallationByUsername(username: string) {
         const installations = await this.getInstallations();
         
@@ -79,11 +84,6 @@ export class GithubService {
         
         // Then get the access token for this installation
         return this.getInstallationAccessToken(installation.id);
-    }
-
-    async getInstallationUrl(state?: string) {
-        let url = `https://github.com/apps/reposcale/installations/select_target`;
-        return url;
     }
 
     async handleInstallationCallback(code: string, state?: string) {

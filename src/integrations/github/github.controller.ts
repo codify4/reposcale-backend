@@ -15,8 +15,7 @@ export class GithubController {
     }
 
     @Get('install')
-    async redirectToInstallation(@GetCurrentUser('username') username: string) {
-        const state = username;
+    async redirectToInstallation() {
         const installUrl = "https://github.com/apps/reposcale/installations/select_target"
         this.logger.log(`Installation URL: ${installUrl}`);
         

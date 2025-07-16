@@ -1,4 +1,4 @@
-import { Injectable, Logger, UnauthorizedException, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import * as jwt from 'jsonwebtoken';
 import { firstValueFrom } from 'rxjs';
@@ -11,6 +11,60 @@ export class GithubService {
         private readonly httpService: HttpService, 
         private readonly prisma: PrismaService
     ) {}
+
+    async getInstallationUrl(userId: number){
+        const state = jwt.sign(
+            { userId },
+            process.env.GITHUB_APP_STATE_SECRET,
+            { expiresIn: '10m' }
+        );
+        const installationUrl = `https://github.com/apps/reposcale/installations/new?state=${state}`;
+        return {
+            url: installationUrl,
+            message: 'Redirect to this URL to authorize the GitHub App'
+        };
+    }
+
+    async handleInstallationCallback(installationId: string, state: string) {
+        const decodedState = jwt.verify(state, process.env.GITHUB_APP_STATE_SECRET);
+        const userId = Number(decodedState.userId);
+
+        const token = await this.getInstallationAccessToken(Number(installationId));
+        if(!token) {
+            throw new BadRequestException('Failed to get installation access token');
+        }
+
+        const installation = await this.prisma.githubInstallation.findUnique({
+            where: {
+                installationId,
+            }
+        })
+        if(installation) {
+            return {
+                success: true,
+                message: 'Installation already exists',
+                installation
+            }
+        }
+
+        const newInstallation = await this.prisma.githubInstallation.create({
+            data: {
+                installationId,
+                userId,
+                permissions: token.permissions,
+                repositorySelection: token.repository_selection
+            }
+        })
+        if(!newInstallation) {
+            throw new BadRequestException('Failed to create installation'); 
+        }
+
+        return {
+            success: true,
+            message: 'Installation callback handled successfully',
+            installation: newInstallation
+        }
+    }
 
     async getInstallationAccessToken(installationId: number) {
         const appJwt = this.generateAppJwt();
@@ -40,11 +94,6 @@ export class GithubService {
         }
     }
 
-    async getInstallationUrl(state?: string) {
-        let url = `https://github.com/apps/reposcale/installations/select_target`;
-        return url;
-    }
-
     async getInstallations() {
         const appJwt = this.generateAppJwt();
 
@@ -65,19 +114,6 @@ export class GithubService {
             this.logger.error('Failed to get installations', error);
             throw new UnauthorizedException('Failed to get installations');
         }
-    }
-
-    async handleInstallationCallback(installationId: string, githubId: string) {
-        const token = await this.getInstallationAccessToken(Number(installationId));
-
-        await this.prisma.githubInstallation.create({
-            data: {
-                installationId,
-                githubId,
-                permissions: token.permissions,
-                repositorySelection: token.repository_selection,
-            }
-        })
     }
 
     generateAppJwt() {

@@ -46,13 +46,13 @@ model Order {
 model GithubInstallation {
   id              Int      @id @default(autoincrement())
   installationId  String   @unique
-  githubId        String
+  userId          Int
   permissions     Json?
   repositorySelection String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
-  user            User     @relation(fields: [githubId], references: [githubId])
+  user            User     @relation(fields: [userId], references: [id])
   repositories    Repository[]
 }
 

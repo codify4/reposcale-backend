@@ -1,35 +1,26 @@
-import { Controller, Get, Logger, Param, Query } from '@nestjs/common';
-import { GetCurrentUser } from 'src/auth/common/decorators/get-current-user.decorator';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { GithubService } from './github.service';
-import { HttpService } from '@nestjs/axios';
 import { Public } from 'src/auth/common/decorators/public.decorator';
+import { GetCurrentUserId } from 'src/auth/common/decorators/get-current-user-id.decorator';
 
 @Controller('github')
 export class GithubController {
-    private readonly logger = new Logger(GithubController.name);
-    constructor(private readonly githubService: GithubService, private readonly httpService: HttpService) {}
+    constructor(private readonly githubService: GithubService) {}
 
     @Get('installations')
     async getInstallations() {
-        return this.githubService.getInstallations();
+        return this.githubService.getInstallations();   
     }
 
     @Get('install')
-    async redirectToInstallation() {
-        const installUrl = "https://github.com/apps/reposcale/installations/select_target"
-        this.logger.log(`Installation URL: ${installUrl}`);
-        
-        return {
-            url: installUrl,
-            message: 'Redirect to this URL to authorize the GitHub App'
-        };
+    async getInstallationUrl(@GetCurrentUserId() userId: number) {
+        return this.githubService.getInstallationUrl(userId);
     }
 
     @Public()
     @Get('app/callback')
     async handleGitHubAppCallback(
         @Query('installation_id') installationId: string,
-        @Query('setup_action') setupAction: string,
         @Query('state') state: string
     ) {
         if (!installationId) {
@@ -39,23 +30,7 @@ export class GithubController {
             };
         }
 
-        try {
-            const token = await this.githubService.getInstallationAccessToken(Number(installationId));
-            return {
-                success: true,
-                installation_id: installationId,
-                access_token: token,
-                setupAction,
-                state,
-                message: 'GitHub App installed and access token generated successfully'
-            };
-        } catch (error) {
-            this.logger.error('Failed to get installation access token', error);
-            return {
-                success: false,
-                message: 'Failed to get installation access token'
-            };
-        }
+        return this.githubService.handleInstallationCallback(installationId, state);
     }
 
     @Get('installation/:id/access-token')

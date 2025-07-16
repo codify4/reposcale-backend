@@ -2,11 +2,15 @@ import { Injectable, Logger, UnauthorizedException, NotFoundException } from '@n
 import { HttpService } from '@nestjs/axios';
 import * as jwt from 'jsonwebtoken';
 import { firstValueFrom } from 'rxjs';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class GithubService {
     private readonly logger = new Logger(GithubService.name);
-    constructor(private readonly httpService: HttpService) {}
+    constructor(
+        private readonly httpService: HttpService, 
+        private readonly prisma: PrismaService
+    ) {}
 
     async getInstallationAccessToken(installationId: number) {
         const appJwt = this.generateAppJwt();
@@ -63,41 +67,17 @@ export class GithubService {
         }
     }
 
-    async getInstallationByUsername(username: string) {
-        const installations = await this.getInstallations();
-        
-        // Find installation for the specific user
-        const userInstallation = installations.find(installation => 
-            installation.account?.login === username
-        );
-        
-        if (!userInstallation) {
-            throw new NotFoundException(`GitHub App not installed for user: ${username}`);
-        }
-        
-        return userInstallation;
-    }
+    async handleInstallationCallback(installationId: string, githubId: string) {
+        const token = await this.getInstallationAccessToken(Number(installationId));
 
-    async getAppAccessToken(username: string) {
-        // First get the installation for this user
-        const installation = await this.getInstallationByUsername(username);
-        
-        // Then get the access token for this installation
-        return this.getInstallationAccessToken(installation.id);
-    }
-
-    async handleInstallationCallback(code: string, state?: string) {
-        // This method would handle the installation callback
-        // You might want to store the installation info or redirect the user
-        this.logger.log(`Installation callback received with code: ${code}, state: ${state}`);
-        
-        // After installation, you can get the installation info
-        const installations = await this.getInstallations();
-        return {
-            success: true,
-            installations,
-            message: 'GitHub App installed successfully'
-        };
+        await this.prisma.githubInstallation.create({
+            data: {
+                installationId,
+                githubId,
+                permissions: token.permissions,
+                repositorySelection: token.repository_selection,
+            }
+        })
     }
 
     generateAppJwt() {

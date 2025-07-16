@@ -58,11 +58,6 @@ export class GithubController {
         }
     }
 
-    @Get('installation-at')
-    async getInstallationAccessToken(@GetCurrentUser('username') username: string) {
-        return this.githubService.getAppAccessToken(username);
-    }
-
     @Get('installation/:id/access-token')
     async getInstallationAccessTokenById(@Param('id') installationId: string) {
         return this.githubService.getInstallationAccessToken(parseInt(installationId));

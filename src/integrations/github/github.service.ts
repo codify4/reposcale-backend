@@ -110,7 +110,11 @@ export class GithubService {
 
         if(!repos) {
             this.logger.error('No repos found for user', repos);
-            throw new NotFoundException('Failed to get repositories');
+            return {
+                success: false,
+                message: 'No repos found for user',
+                data: repos.data
+            }
         }
 
         const privateRepos = repos.data.repositories.filter((repo: any) => repo.private);  
@@ -134,10 +138,19 @@ export class GithubService {
 
         if(res.status !== 200) {
             this.logger.error('Failed to get repo', res);
-            throw new NotFoundException('Failed to get repo');
+            return {
+                success: false,
+                message: 'Failed to get repo',
+                data: res.data
+            }
         }
 
-        return res.data;
+        const content = Buffer.from(res.data.content, 'base64').toString('utf-8');
+
+        return {
+            ...res.data,
+            content,
+        };
     }
 
     async getUserInstallation(userId: number) {

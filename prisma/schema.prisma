@@ -61,11 +61,12 @@ model Repository {
   githubRepoId    Int      @unique
   installationId  String
   name            String
-  fullName        String
   description     String?
-  private         Boolean  @default(true)
   languages       Json?
-  topics          Json?
+  stars           Int
+  forks           Int
+  watchers        Int
+  members         Int?
   lastFetched     DateTime @default(now())
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt

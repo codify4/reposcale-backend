@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import * as jwt from 'jsonwebtoken';
 import { firstValueFrom } from 'rxjs';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { CreateRepoDto } from './dto/create-repo.dto';
 
 @Injectable()
 export class GithubService {
@@ -116,6 +117,57 @@ export class GithubService {
         const privateRepos = repos.data.repositories.filter((repo: any) => repo.private);  
 
         return privateRepos;
+    }
+
+    async listRepos(userId: number) {
+        const installation = await this.getUserInstallation(userId);
+        
+        const repos = await this.prisma.repository.findMany({
+            where: {
+                installationId: installation.installationId
+            }
+        })
+
+        return {
+            success: true,
+            message: 'Repos listed successfully',
+            data: repos
+        };
+    }
+
+    async createSingleRepo(createRepoDto: CreateRepoDto) {
+        const repo = await this.prisma.repository.create({
+            data: createRepoDto
+        });
+
+        if(!repo) {
+            this.logger.error('Failed to create repo', repo);
+            throw new BadRequestException('Failed to create repo');
+        }
+
+        return {
+            success: true,
+            message: 'Repo created successfully',
+            data: repo
+        };
+    }
+
+    async createRepos(createRepoDto: CreateRepoDto[]) {
+        const repos = await this.prisma.repository.createMany({
+            data: createRepoDto,
+            skipDuplicates: true
+        });
+
+        if(!repos) {
+            this.logger.error('Failed to create repos', repos);
+            throw new BadRequestException('Failed to create repos');
+        }
+
+        return {
+            success: true,
+            message: 'Repos created successfully',
+            data: repos
+        };
     }
 
     async getRepo(owner: string, repo: string, path: string = "", userId: number) {

@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { Public } from 'src/auth/common/decorators/public.decorator';
 import { GetCurrentUserId } from 'src/auth/common/decorators/get-current-user-id.decorator';
+import { CreateRepoDto } from './dto/create-repo.dto';
 
 @Controller('github')
 export class GithubController {
@@ -31,6 +32,19 @@ export class GithubController {
     @Get('repos')
     async getRepos(@GetCurrentUserId() userId: number) {
         return this.githubService.getRepos(userId);
+    }
+
+    @Get('repos/list')
+    async listRepos(@GetCurrentUserId() userId: number) {
+        return this.githubService.listRepos(userId);
+    }
+
+    @Post('repos/new')
+    async createRepo(@Body() createRepoDto: CreateRepoDto | CreateRepoDto[]) {
+        if(Array.isArray(createRepoDto)) {
+            return this.githubService.createRepos(createRepoDto);
+        }
+        return this.githubService.createSingleRepo(createRepoDto);
     }
 
     @Get('repos/:owner/:repo/contents/:path?')

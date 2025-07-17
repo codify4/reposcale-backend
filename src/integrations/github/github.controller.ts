@@ -33,12 +33,12 @@ export class GithubController {
         return this.githubService.getRepos(userId);
     }
 
-    @Get('repos/:owner/:repo/contents')
+    @Get('repos/:owner/:repo/contents/:path?')
     async getRepo(
         @GetCurrentUserId() userId: number,
         @Param('owner') owner: string,
         @Param('repo') repo: string,
-        @Query('path') path: string
+        @Param('path') path: string
     ) {
         return this.githubService.getRepo(owner, repo, path, userId); 
     }

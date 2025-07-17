@@ -110,11 +110,7 @@ export class GithubService {
 
         if(!repos) {
             this.logger.error('No repos found for user', repos);
-            return {
-                success: false,
-                message: 'No repos found for user',
-                data: repos.data
-            }
+            throw new NotFoundException('No repos found for user');
         }
 
         const privateRepos = repos.data.repositories.filter((repo: any) => repo.private);  
@@ -141,16 +137,24 @@ export class GithubService {
             return {
                 success: false,
                 message: 'Failed to get repo',
-                data: res.data
+                data: res.data,
+                status: res.status
             }
         }
 
-        const content = Buffer.from(res.data.content, 'base64').toString('utf-8');
+        if (res.data.type === 'file' && res.data.content) {
+            const content = Buffer.from(res.data.content, 'base64').toString('utf-8');
+            return {
+                ...res.data,
+                content,
+            };
+        }
 
         return {
-            ...res.data,
-            content,
-        };
+            success: true,
+            message: 'Repo fetched successfully',
+            data: res.data
+        }
     }
 
     async getUserInstallation(userId: number) {

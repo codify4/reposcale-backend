@@ -94,26 +94,64 @@ export class GithubService {
         }
     }
 
-    async getInstallations() {
-        const appJwt = this.generateAppJwt();
+    async getRepos(userId: number) {
+        const installation = await this.getUserInstallation(userId);
+        const token = await this.getInstallationAccessToken(Number(installation.installationId));
 
-        try {
-            const installationsResponse = await firstValueFrom(this.httpService.get(
-                'https://api.github.com/app/installations',
-                {
-                    headers: {
-                        Authorization: `Bearer ${appJwt}`,
-                        Accept: 'application/vnd.github+json',
-                    },
-                }
-            ));
-            
-            this.logger.log(`Found ${installationsResponse.data.length} installations`);
-            return installationsResponse.data;
-        } catch (error) {
-            this.logger.error('Failed to get installations', error);
-            throw new UnauthorizedException('Failed to get installations');
+        const repos = await firstValueFrom(this.httpService.get(
+            `https://api.github.com/installation/repositories`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token.token}`,
+                    Accept: 'application/vnd.github+json',
+                },
+            }
+        ));
+
+        if(!repos) {
+            this.logger.error('No repos found for user', repos);
+            throw new NotFoundException('Failed to get repositories');
         }
+
+        return repos.data;
+    }
+
+    async getRepo(owner: string, repo: string, path: string = "", userId: number) {
+        const installation = await this.getUserInstallation(userId);
+        const token = await this.getInstallationAccessToken(Number(installation.installationId));
+
+        const res = await firstValueFrom(this.httpService.get(
+            `https://api.github.com/repos/${owner}/${repo}/contents/${path}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token.token}`,
+                    Accept: 'application/vnd.github+json',
+                },
+            }
+        ));
+
+        if(res.status !== 200) {
+            this.logger.error('Failed to get repo', res);
+            return {
+                success: false,
+                message: 'Failed to get repo',
+                data: res.data
+            }
+        }
+
+        return res.data;
+    }
+
+    async getUserInstallation(userId: number) {
+        const installations = await this.prisma.githubInstallation.findFirst({
+            where: {
+                userId,
+            }
+        })
+        if(!installations) {
+            throw new NotFoundException('No installation found for user');
+        }
+        return installations;
     }
 
     generateAppJwt() {

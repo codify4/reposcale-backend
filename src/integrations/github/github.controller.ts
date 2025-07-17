@@ -7,11 +7,6 @@ import { GetCurrentUserId } from 'src/auth/common/decorators/get-current-user-id
 export class GithubController {
     constructor(private readonly githubService: GithubService) {}
 
-    @Get('installations')
-    async getInstallations() {
-        return this.githubService.getInstallations();   
-    }
-
     @Get('install')
     async getInstallationUrl(@GetCurrentUserId() userId: number) {
         return this.githubService.getInstallationUrl(userId);
@@ -33,8 +28,18 @@ export class GithubController {
         return this.githubService.handleInstallationCallback(installationId, state);
     }
 
-    @Get('installation/:id/access-token')
-    async getInstallationAccessTokenById(@Param('id') installationId: string) {
-        return this.githubService.getInstallationAccessToken(parseInt(installationId));
+    @Get('repos')
+    async getRepos(@GetCurrentUserId() userId: number) {
+        return this.githubService.getRepos(userId);
+    }
+
+    @Get('repos/:owner/:repo/contents')
+    async getRepo(
+        @GetCurrentUserId() userId: number,
+        @Param('owner') owner: string,
+        @Param('repo') repo: string,
+        @Query('path') path: string
+    ) {
+        return this.githubService.getRepo(owner, repo, path, userId); 
     }
 }

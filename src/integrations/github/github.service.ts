@@ -18,7 +18,7 @@ export class GithubService {
             process.env.GITHUB_APP_STATE_SECRET,
             { expiresIn: '10m' }
         );
-        const installationUrl = `https://github.com/apps/reposcale/installations/new?state=${state}`;
+        const installationUrl = `https://github.com/apps/reposcale/installations/select_target?state=${state}`;
         return {
             url: installationUrl,
             message: 'Redirect to this URL to authorize the GitHub App'

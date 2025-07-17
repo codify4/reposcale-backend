@@ -97,7 +97,7 @@ export class GithubService {
     async getRepos(userId: number) {
         const installation = await this.getUserInstallation(userId);
         const token = await this.getInstallationAccessToken(Number(installation.installationId));
-
+    
         const repos = await firstValueFrom(this.httpService.get(
             `https://api.github.com/installation/repositories`,
             {
@@ -113,7 +113,9 @@ export class GithubService {
             throw new NotFoundException('Failed to get repositories');
         }
 
-        return repos.data;
+        const privateRepos = repos.data.repositories.filter((repo: any) => repo.private);  
+
+        return privateRepos;
     }
 
     async getRepo(owner: string, repo: string, path: string = "", userId: number) {
@@ -132,11 +134,7 @@ export class GithubService {
 
         if(res.status !== 200) {
             this.logger.error('Failed to get repo', res);
-            return {
-                success: false,
-                message: 'Failed to get repo',
-                data: res.data
-            }
+            throw new NotFoundException('Failed to get repo');
         }
 
         return res.data;

@@ -18,7 +18,7 @@ import { GetCurrentUserId } from '../../auth/common/decorators/get-current-user-
 export class LinksController {
   constructor(private readonly linksService: LinksService) {}
 
-  @Post()
+  @Post('new')
   async createShareLink(
     @GetCurrentUserId() userId: number,
     @Body() createShareLinkDto: CreateShareLinkDto
@@ -26,7 +26,7 @@ export class LinksController {
     return this.linksService.createShareLink(userId, createShareLinkDto);
   }
 
-  @Get()
+  @Get('all')
   async listShareLinks(@GetCurrentUserId() userId: number) {
     return this.linksService.listShareLinks(userId);
   }

@@ -7,5 +7,6 @@ import { HttpModule } from '@nestjs/axios';
   imports: [HttpModule],
   controllers: [GithubController],
   providers: [GithubService],
+  exports: [GithubService],
 })
 export class GithubModule {}

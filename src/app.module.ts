@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { UserModule } from './public/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GithubModule } from './integrations/github/github.module';
@@ -7,13 +7,14 @@ import { AnalyticsController } from './public/analytics/analytics.controller';
 import { AnalyticsModule } from './public/analytics/analytics.module';
 import { BucketsService } from './public/buckets/buckets.service';
 import { BucketsModule } from './public/buckets/buckets.module';
-import { LinksController } from './public/links/links.controller';
 import { LinksModule } from './public/links/links.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/common/guards/jwt.guard';
 import { OrdersModule } from './integrations/orders/orders.module';
+import { RateLimitMiddleware } from './middleware/rate-limit.middleware';
+import { PublicLinkModule } from './public/public-link/public-link.module';
 
 @Module({
   imports: [
@@ -27,8 +28,9 @@ import { OrdersModule } from './integrations/orders/orders.module';
     PrismaModule,
     ConfigModule.forRoot({ isGlobal: true }),
     OrdersModule,
+    PublicLinkModule,
   ],
-  controllers: [AnalyticsController, LinksController],
+  controllers: [AnalyticsController],
   providers: [
     BucketsService,
     {
@@ -37,4 +39,13 @@ import { OrdersModule } from './integrations/orders/orders.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(RateLimitMiddleware)
+      .forRoutes(
+        'public/*',
+        'links/*'
+      );
+  }
+}

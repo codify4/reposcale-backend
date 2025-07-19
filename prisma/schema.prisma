@@ -30,6 +30,16 @@ model User {
   @@map("users")
 }
 
+model Waitlist {
+  id        Int     @id @default(autoincrement())
+  name      String
+  email     String  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("waitlist")
+}
+
 model Order {
   id           String   @id @default(cuid())
   lemonOrderId String   @unique

@@ -15,6 +15,7 @@ import { JwtGuard } from './auth/common/guards/jwt.guard';
 import { OrdersModule } from './integrations/orders/orders.module';
 import { RateLimitMiddleware } from './middleware/rate-limit.middleware';
 import { PublicLinkModule } from './public/public-link/public-link.module';
+import { WaitlistModule } from './public/waitlist/waitlist.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PublicLinkModule } from './public/public-link/public-link.module';
     ConfigModule.forRoot({ isGlobal: true }),
     OrdersModule,
     PublicLinkModule,
+    WaitlistModule,
   ],
   controllers: [AnalyticsController],
   providers: [

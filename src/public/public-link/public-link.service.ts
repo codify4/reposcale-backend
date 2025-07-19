@@ -71,7 +71,6 @@ export class PublicLinkService {
           id: shareLink.id,
           name: shareLink.name,
           description: shareLink.description,
-          allowMembers: shareLink.allowMembers,
           repository: shareLink.repository,
           user: shareLink.user,
         }
@@ -85,7 +84,6 @@ export class PublicLinkService {
         data: {
           shareLinkId,
           ipAddress,
-          userAgent: 'API Access',
         }
       }),
       this.prisma.shareLink.update({
@@ -124,7 +122,7 @@ export class PublicLinkService {
     }
 
     if (!shareLink.isActive) {
-      throw new ForbiddenException('Share link is inactive');
+      throw new ForbiddenException('Share link is inactive');   
     }
 
     if (shareLink.expiresAt && shareLink.expiresAt < new Date()) {
@@ -143,7 +141,6 @@ export class PublicLinkService {
         name: shareLink.name,
         description: shareLink.description,
         hasPassword: !!shareLink.password,
-        allowMembers: shareLink.allowMembers,
         viewCount: shareLink.viewCount,
         maxViews: shareLink.maxViews,
         expiresAt: shareLink.expiresAt,

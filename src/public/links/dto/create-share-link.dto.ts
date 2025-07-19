@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, IsBoolean, IsDateString, Min, Max } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsDateString, Min, Max } from 'class-validator';
 
 export class CreateShareLinkDto {
   @IsNumber()
@@ -24,8 +24,4 @@ export class CreateShareLinkDto {
   @IsNumber()
   @Min(1)
   maxViews?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  allowMembers?: boolean;
 } 

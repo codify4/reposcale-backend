@@ -98,7 +98,6 @@ model ShareLink {
   maxViews    Int?
   viewCount   Int      @default(0)
   isActive    Boolean  @default(true)
-  allowMembers Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
@@ -111,7 +110,6 @@ model ShareView {
   id          String   @id @default(cuid())
   shareLinkId String
   ipAddress   String?
-  userAgent   String?
   viewedAt    DateTime @default(now())
   
   shareLink   ShareLink @relation(fields: [shareLinkId], references: [id])

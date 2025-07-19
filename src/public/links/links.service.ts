@@ -8,7 +8,7 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class LinksService {
-  constructor(private readonly prisma: PrismaService) {}gith
+  constructor(private readonly prisma: PrismaService) {}
 
   private generateSecureToken(): string {
     return crypto.randomBytes(32).toString('hex');
@@ -61,7 +61,6 @@ export class LinksService {
         password: passwordHash,
         expiresAt,
         maxViews: createShareLinkDto.maxViews,
-        allowMembers: createShareLinkDto.allowMembers || false,
       },
       include: {
         repository: true,
@@ -199,7 +198,6 @@ export class LinksService {
         password: passwordHash,
         expiresAt,
         maxViews: updateShareLinkDto.maxViews,
-        allowMembers: updateShareLinkDto.allowMembers,
       },
       include: {
         repository: {
@@ -308,7 +306,6 @@ export class LinksService {
           id: shareLink.id,
           name: shareLink.name,
           description: shareLink.description,
-          allowMembers: shareLink.allowMembers,
           repository: shareLink.repository,
           user: shareLink.user,
         }
@@ -326,7 +323,6 @@ export class LinksService {
         data: {
           shareLinkId,
           ipAddress,
-          userAgent: 'API Access', // Could be enhanced with actual user agent
         }
       }),
       // Increment view count

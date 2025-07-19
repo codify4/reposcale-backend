@@ -3,9 +3,7 @@ import { UserModule } from './public/user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { GithubModule } from './integrations/github/github.module';
 import { LemonSqueezyModule } from './integrations/lemonsqueezy/lemonsqueezy.module';
-import { AnalyticsController } from './public/analytics/analytics.controller';
 import { AnalyticsModule } from './public/analytics/analytics.module';
-import { BucketsService } from './public/buckets/buckets.service';
 import { BucketsModule } from './public/buckets/buckets.module';
 import { LinksModule } from './public/links/links.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -32,9 +30,7 @@ import { WaitlistModule } from './public/waitlist/waitlist.module';
     PublicLinkModule,
     WaitlistModule,
   ],
-  controllers: [AnalyticsController],
   providers: [
-    BucketsService,
     {
       provide: APP_GUARD,
       useClass: JwtGuard,

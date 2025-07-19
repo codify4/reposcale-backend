@@ -23,5 +23,5 @@ export class CreateShareLinkDto {
   @IsOptional()
   @IsNumber()
   @Min(1)
-  maxViews?: number;
+  maxMembers?: number;
 } 

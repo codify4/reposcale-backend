@@ -60,7 +60,7 @@ export class LinksService {
         description: createShareLinkDto.description,
         password: passwordHash,
         expiresAt,
-        maxViews: createShareLinkDto.maxViews,
+        maxMembers: createShareLinkDto.maxMembers,
       },
       include: {
         repository: true,
@@ -100,7 +100,7 @@ export class LinksService {
         },
         _count: {
           select: {
-            views: true
+            members: true
           }
         }
       },
@@ -134,15 +134,15 @@ export class LinksService {
             description: true,
           }
         },
-        views: {
+        members: {
           orderBy: {
-            viewedAt: 'desc'
+            joinedAt: 'desc'
           },
           take: 10
         },
         _count: {
           select: {
-            views: true
+            members: true
           }
         }
       }
@@ -197,7 +197,7 @@ export class LinksService {
         description: updateShareLinkDto.description,
         password: passwordHash,
         expiresAt,
-        maxViews: updateShareLinkDto.maxViews,
+        maxMembers: updateShareLinkDto.maxMembers,
       },
       include: {
         repository: {
@@ -279,7 +279,7 @@ export class LinksService {
     }
 
     // Check view limit
-    if (shareLink.maxViews && shareLink.viewCount >= shareLink.maxViews) {
+    if (shareLink.maxMembers && shareLink.memberCount >= shareLink.maxMembers) {
       throw new ForbiddenException('Share link view limit exceeded');
     }
 
@@ -319,7 +319,7 @@ export class LinksService {
   private async recordView(shareLinkId: string, ipAddress?: string) {
     await this.prisma.$transaction([
       // Record the view
-      this.prisma.shareView.create({
+      this.prisma.shareMember.create({
         data: {
           shareLinkId,
           ipAddress,
@@ -329,7 +329,7 @@ export class LinksService {
       this.prisma.shareLink.update({
         where: { id: shareLinkId },
         data: {
-          viewCount: {
+          memberCount: {
             increment: 1
           }
         }
@@ -347,14 +347,14 @@ export class LinksService {
         userId,
       },
       include: {
-        views: {
+        members: {
           orderBy: {
-            viewedAt: 'desc'
+            joinedAt: 'desc'
           }
         },
         _count: {
           select: {
-            views: true
+            members: true
           }
         }
       }
@@ -368,13 +368,13 @@ export class LinksService {
       success: true,
       message: 'Analytics retrieved successfully',
       data: {
-        totalViews: shareLink._count.views,
-        recentViews: shareLink.views.slice(0, 20), // Last 20 views
+        totalMembers: shareLink._count.members,
+        recentMembers: shareLink.members.slice(0, 20), // Last 20 members
         shareLink: {
           id: shareLink.id,
           name: shareLink.name,
-          viewCount: shareLink.viewCount,
-          maxViews: shareLink.maxViews,
+          memberCount: shareLink.memberCount,
+          maxMembers: shareLink.maxMembers,
           expiresAt: shareLink.expiresAt,
           isActive: shareLink.isActive,
         }

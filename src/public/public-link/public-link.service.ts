@@ -46,7 +46,7 @@ export class PublicLinkService {
       throw new ForbiddenException('Share link has expired');
     }
 
-    if (shareLink.maxViews && shareLink.viewCount >= shareLink.maxViews) {
+    if (shareLink.maxMembers && shareLink.memberCount >= shareLink.maxMembers) {
       throw new ForbiddenException('Share link view limit exceeded');
     }
 
@@ -80,7 +80,7 @@ export class PublicLinkService {
 
   private async recordView(shareLinkId: string, ipAddress?: string) {
     await this.prisma.$transaction([
-      this.prisma.shareView.create({
+      this.prisma.shareMember.create({
         data: {
           shareLinkId,
           ipAddress,
@@ -89,7 +89,7 @@ export class PublicLinkService {
       this.prisma.shareLink.update({
         where: { id: shareLinkId },
         data: {
-          viewCount: {
+          memberCount: {
             increment: 1
           }
         }
@@ -129,7 +129,7 @@ export class PublicLinkService {
       throw new ForbiddenException('Share link has expired');
     }
 
-    if (shareLink.maxViews && shareLink.viewCount >= shareLink.maxViews) {
+    if (shareLink.maxMembers && shareLink.memberCount >= shareLink.maxMembers) {
       throw new ForbiddenException('Share link view limit exceeded');
     }
 
@@ -141,8 +141,8 @@ export class PublicLinkService {
         name: shareLink.name,
         description: shareLink.description,
         hasPassword: !!shareLink.password,
-        viewCount: shareLink.viewCount,
-        maxViews: shareLink.maxViews,
+        memberCount: shareLink.memberCount,
+        maxMembers: shareLink.maxMembers,
         expiresAt: shareLink.expiresAt,
         repository: shareLink.repository,
         user: shareLink.user,

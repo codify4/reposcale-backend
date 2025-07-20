@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsArray, IsNumber, IsDateString, Min } from 'class-validator';
+import { IsString, IsOptional, IsArray, IsNumber, IsDateString, Min, IsBoolean } from 'class-validator';
 
 export class CreateBucketDto {
   @IsString()
@@ -25,4 +25,8 @@ export class CreateBucketDto {
   @IsOptional()
   @Min(1)
   maxMembers?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }

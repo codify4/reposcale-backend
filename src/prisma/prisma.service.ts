@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { PrismaClient } from 'generated/prisma';
+import { withAccelerate } from '@prisma/extension-accelerate';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit {
@@ -11,6 +12,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
         },
       },
     });
+    
+    this.$extends(withAccelerate());
   }
 
   async onModuleInit() {

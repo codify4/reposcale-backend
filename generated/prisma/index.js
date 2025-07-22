@@ -284,7 +284,6 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -295,7 +294,7 @@ const config = {
   },
   "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/prisma\"\n  binaryTargets = [\"native\", \"debian-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id                 Int                  @id @default(autoincrement())\n  githubId           String               @unique\n  email              String?              @unique\n  username           String\n  name               String?\n  avatarUrl          String?\n  createdAt          DateTime             @default(now())\n  updatedAt          DateTime             @updatedAt\n  orders             Order[]\n  githubInstallation GithubInstallation[]\n  shareLinks         ShareLink[]\n  buckets            Bucket[]\n\n  @@map(\"users\")\n}\n\nmodel Waitlist {\n  id        Int      @id @default(autoincrement())\n  name      String\n  email     String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@map(\"waitlist\")\n}\n\nmodel Order {\n  id           String   @id @default(cuid())\n  lemonOrderId String   @unique\n  userId       Int\n  productId    Int\n  variantId    Int\n  amount       Float\n  purchasedAt  DateTime\n  createdAt    DateTime @default(now())\n  updatedAt    DateTime @updatedAt\n\n  user User @relation(fields: [userId], references: [id])\n}\n\nmodel GithubInstallation {\n  id                  Int      @id @default(autoincrement())\n  installationId      String   @unique\n  userId              Int\n  permissions         Json?\n  repositorySelection String\n  createdAt           DateTime @default(now())\n  updatedAt           DateTime @updatedAt\n\n  user         User         @relation(fields: [userId], references: [id])\n  repositories Repository[]\n}\n\nmodel Repository {\n  id             Int      @id @default(autoincrement())\n  githubRepoId   Int      @unique\n  installationId String\n  name           String\n  description    String?\n  languages      Json?\n  stars          Int\n  forks          Int\n  watchers       Int\n  members        Int?\n  lastFetched    DateTime @default(now())\n  createdAt      DateTime @default(now())\n  updatedAt      DateTime @updatedAt\n\n  installation       GithubInstallation @relation(fields: [installationId], references: [installationId])\n  shareLinks         ShareLink[]\n  bucketRepositories BucketRepository[]\n}\n\nmodel ShareLink {\n  id           String    @id @default(cuid())\n  userId       Int\n  repositoryId Int\n  token        String    @unique\n  name         String?\n  description  String?\n  password     String?\n  expiresAt    DateTime?\n  maxMembers   Int?\n  memberCount  Int       @default(0)\n  isActive     Boolean   @default(true)\n  createdAt    DateTime  @default(now())\n  updatedAt    DateTime  @updatedAt\n\n  user       User          @relation(fields: [userId], references: [id])\n  repository Repository    @relation(fields: [repositoryId], references: [id])\n  members    ShareMember[]\n}\n\nmodel ShareMember {\n  id          String   @id @default(cuid())\n  shareLinkId String\n  ipAddress   String?\n  joinedAt    DateTime @default(now())\n\n  shareLink ShareLink @relation(fields: [shareLinkId], references: [id])\n}\n\nmodel Bucket {\n  id          String    @id @default(cuid())\n  userId      Int\n  token       String    @unique\n  name        String?\n  description String?\n  password    String?\n  expiresAt   DateTime?\n  maxMembers  Int?\n  memberCount Int       @default(0)\n  isActive    Boolean   @default(true)\n  createdAt   DateTime  @default(now())\n  updatedAt   DateTime  @updatedAt\n\n  user         User               @relation(fields: [userId], references: [id])\n  repositories BucketRepository[]\n  members      BucketMember[]\n}\n\nmodel BucketRepository {\n  id           String   @id @default(cuid())\n  bucketId     String\n  repositoryId Int\n  createdAt    DateTime @default(now())\n\n  bucket     Bucket     @relation(fields: [bucketId], references: [id])\n  repository Repository @relation(fields: [repositoryId], references: [id])\n}\n\nmodel BucketMember {\n  id        String   @id @default(cuid())\n  bucketId  String\n  ipAddress String?\n  joinedAt  DateTime @default(now())\n\n  bucket Bucket @relation(fields: [bucketId], references: [id])\n}\n",
   "inlineSchemaHash": "f4998430c9ef848e78f3adafffde85013784ef78a9c2210258086b9e3cb491cb",
-  "copyEngine": true
+  "copyEngine": false
 }
 
 const fs = require('fs')
@@ -332,13 +331,3 @@ const PrismaClient = getPrismaClient(config)
 exports.PrismaClient = PrismaClient
 Object.assign(exports, Prisma)
 
-// file annotations for bundling tools to include these files
-path.join(__dirname, "query_engine-windows.dll.node");
-path.join(process.cwd(), "generated/prisma/query_engine-windows.dll.node")
-
-// file annotations for bundling tools to include these files
-path.join(__dirname, "libquery_engine-debian-openssl-3.0.x.so.node");
-path.join(process.cwd(), "generated/prisma/libquery_engine-debian-openssl-3.0.x.so.node")
-// file annotations for bundling tools to include these files
-path.join(__dirname, "schema.prisma");
-path.join(process.cwd(), "generated/prisma/schema.prisma")

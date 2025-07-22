@@ -14,6 +14,7 @@ import { OrdersModule } from './integrations/orders/orders.module';
 import { RateLimitMiddleware } from './middleware/rate-limit.middleware';
 import { PublicLinkModule } from './public/public-link/public-link.module';
 import { WaitlistModule } from './public/waitlist/waitlist.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -36,14 +37,12 @@ import { WaitlistModule } from './public/waitlist/waitlist.module';
       useClass: JwtGuard,
     },
   ],
+  controllers: [AppController],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(RateLimitMiddleware)
-      .forRoutes(
-        'public/*',
-        'links/*'
-      );
+      .forRoutes('public/*', 'links/*', 'auth/*', 'integrations/*');
   }
 }

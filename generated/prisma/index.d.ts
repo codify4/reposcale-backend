@@ -3136,7 +3136,6 @@ export namespace Prisma {
 
   export type WaitlistMinAggregateOutputType = {
     id: number | null
-    name: string | null
     email: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3144,7 +3143,6 @@ export namespace Prisma {
 
   export type WaitlistMaxAggregateOutputType = {
     id: number | null
-    name: string | null
     email: string | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -3152,7 +3150,6 @@ export namespace Prisma {
 
   export type WaitlistCountAggregateOutputType = {
     id: number
-    name: number
     email: number
     createdAt: number
     updatedAt: number
@@ -3170,7 +3167,6 @@ export namespace Prisma {
 
   export type WaitlistMinAggregateInputType = {
     id?: true
-    name?: true
     email?: true
     createdAt?: true
     updatedAt?: true
@@ -3178,7 +3174,6 @@ export namespace Prisma {
 
   export type WaitlistMaxAggregateInputType = {
     id?: true
-    name?: true
     email?: true
     createdAt?: true
     updatedAt?: true
@@ -3186,7 +3181,6 @@ export namespace Prisma {
 
   export type WaitlistCountAggregateInputType = {
     id?: true
-    name?: true
     email?: true
     createdAt?: true
     updatedAt?: true
@@ -3281,7 +3275,6 @@ export namespace Prisma {
 
   export type WaitlistGroupByOutputType = {
     id: number
-    name: string
     email: string
     createdAt: Date
     updatedAt: Date
@@ -3308,7 +3301,6 @@ export namespace Prisma {
 
   export type WaitlistSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    name?: boolean
     email?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3316,7 +3308,6 @@ export namespace Prisma {
 
   export type WaitlistSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    name?: boolean
     email?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3324,7 +3315,6 @@ export namespace Prisma {
 
   export type WaitlistSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    name?: boolean
     email?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -3332,20 +3322,18 @@ export namespace Prisma {
 
   export type WaitlistSelectScalar = {
     id?: boolean
-    name?: boolean
     email?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type WaitlistOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "createdAt" | "updatedAt", ExtArgs["result"]["waitlist"]>
+  export type WaitlistOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "createdAt" | "updatedAt", ExtArgs["result"]["waitlist"]>
 
   export type $WaitlistPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Waitlist"
     objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      name: string
       email: string
       createdAt: Date
       updatedAt: Date
@@ -3773,7 +3761,6 @@ export namespace Prisma {
    */
   interface WaitlistFieldRefs {
     readonly id: FieldRef<"Waitlist", 'Int'>
-    readonly name: FieldRef<"Waitlist", 'String'>
     readonly email: FieldRef<"Waitlist", 'String'>
     readonly createdAt: FieldRef<"Waitlist", 'DateTime'>
     readonly updatedAt: FieldRef<"Waitlist", 'DateTime'>
@@ -13419,7 +13406,6 @@ export namespace Prisma {
 
   export const WaitlistScalarFieldEnum: {
     id: 'id',
-    name: 'name',
     email: 'email',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -13754,7 +13740,6 @@ export namespace Prisma {
     OR?: WaitlistWhereInput[]
     NOT?: WaitlistWhereInput | WaitlistWhereInput[]
     id?: IntFilter<"Waitlist"> | number
-    name?: StringFilter<"Waitlist"> | string
     email?: StringFilter<"Waitlist"> | string
     createdAt?: DateTimeFilter<"Waitlist"> | Date | string
     updatedAt?: DateTimeFilter<"Waitlist"> | Date | string
@@ -13762,7 +13747,6 @@ export namespace Prisma {
 
   export type WaitlistOrderByWithRelationInput = {
     id?: SortOrder
-    name?: SortOrder
     email?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13774,14 +13758,12 @@ export namespace Prisma {
     AND?: WaitlistWhereInput | WaitlistWhereInput[]
     OR?: WaitlistWhereInput[]
     NOT?: WaitlistWhereInput | WaitlistWhereInput[]
-    name?: StringFilter<"Waitlist"> | string
     createdAt?: DateTimeFilter<"Waitlist"> | Date | string
     updatedAt?: DateTimeFilter<"Waitlist"> | Date | string
   }, "id" | "email">
 
   export type WaitlistOrderByWithAggregationInput = {
     id?: SortOrder
-    name?: SortOrder
     email?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -13797,7 +13779,6 @@ export namespace Prisma {
     OR?: WaitlistScalarWhereWithAggregatesInput[]
     NOT?: WaitlistScalarWhereWithAggregatesInput | WaitlistScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Waitlist"> | number
-    name?: StringWithAggregatesFilter<"Waitlist"> | string
     email?: StringWithAggregatesFilter<"Waitlist"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Waitlist"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Waitlist"> | Date | string
@@ -14500,7 +14481,6 @@ export namespace Prisma {
   }
 
   export type WaitlistCreateInput = {
-    name: string
     email: string
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -14508,14 +14488,12 @@ export namespace Prisma {
 
   export type WaitlistUncheckedCreateInput = {
     id?: number
-    name: string
     email: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type WaitlistUpdateInput = {
-    name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14523,7 +14501,6 @@ export namespace Prisma {
 
   export type WaitlistUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14531,14 +14508,12 @@ export namespace Prisma {
 
   export type WaitlistCreateManyInput = {
     id?: number
-    name: string
     email: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
 
   export type WaitlistUpdateManyMutationInput = {
-    name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -14546,7 +14521,6 @@ export namespace Prisma {
 
   export type WaitlistUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    name?: StringFieldUpdateOperationsInput | string
     email?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -15396,7 +15370,6 @@ export namespace Prisma {
 
   export type WaitlistCountOrderByAggregateInput = {
     id?: SortOrder
-    name?: SortOrder
     email?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -15408,7 +15381,6 @@ export namespace Prisma {
 
   export type WaitlistMaxOrderByAggregateInput = {
     id?: SortOrder
-    name?: SortOrder
     email?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -15416,7 +15388,6 @@ export namespace Prisma {
 
   export type WaitlistMinOrderByAggregateInput = {
     id?: SortOrder
-    name?: SortOrder
     email?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder

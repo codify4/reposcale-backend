@@ -8,7 +8,9 @@ export class WaitlistService {
 
     async createWaitlist(createWaitlistDto: CreateWaitlistDto) {
         const waitlist = await this.prisma.waitlist.create({
-            data: createWaitlistDto,
+            data: {
+                email: createWaitlistDto.email,
+            },
         });
 
         if (!waitlist) {
